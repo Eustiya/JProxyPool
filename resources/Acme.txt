@@ -1,3 +1,3 @@
-{"address":"211.147.226.4","port":"8118","anonymityDegree":"ELITE_PROXY","proxyPriority":"NIUBILITY","proxySpeed":"SLOWEST"}
-{"address":"59.37.18.243","port":"3128","anonymityDegree":"ELITE_PROXY","proxyPriority":"NIUBILITY","proxySpeed":"SLOWEST"}
 {"address":"103.39.214.69","port":"8118","anonymityDegree":"ELITE_PROXY","proxyPriority":"NIUBILITY","proxySpeed":"SLOWEST"}
+{"address":"59.37.18.243","port":"3128","anonymityDegree":"ELITE_PROXY","proxyPriority":"NIUBILITY","proxySpeed":"SLOWEST"}
+{"address":"211.147.226.4","port":"8118","anonymityDegree":"ELITE_PROXY","proxyPriority":"NIUBILITY","proxySpeed":"SLOWEST"}

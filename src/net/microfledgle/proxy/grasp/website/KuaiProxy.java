@@ -46,8 +46,6 @@ public class KuaiProxy implements Website,Runnable {
     
     private static ThreadPoolHandler threadPoolHandler = new ThreadPoolHandler();
     
-    
-    //"https://www.kuaidaili.com/free/inha/1/"
     private static final String URL = "https://www.kuaidaili.com/free/inha/";
     
     private static void inits(){
@@ -87,7 +85,6 @@ public class KuaiProxy implements Website,Runnable {
                 for (Element element1 : td) {
                     String ip$ = element1.getElementsByAttributeValue("data-title", "IP").text();
                     if(!"".equals(ip$)){
-                       ip = ip$;
                     }
                     String port$ = element1.getElementsByAttributeValue("data-title", "PORT").text();
                     if(!"".equals(port$)){

@@ -33,21 +33,13 @@ import java.util.zip.ZipOutputStream;
  */
 public class ZipBackup {
     
-    /**
-     * 缓冲器大小
-     */
+
     private static final int BUFFER = 512;
     
-    /**
-     * 压缩得到的文件的后缀名
-     */
+
     private static final String SUFFIX = ".zip";
     
-    /**
-     * 得到源文件路径的所有文件
-     *
-     * @param dirFile 压缩源文件路径
-     */
+
     public static List<File> getAllFile(File dirFile) {
         List<File> fileList = new ArrayList<>();
         File[] files = dirFile.listFiles();
@@ -55,10 +47,10 @@ public class ZipBackup {
             if (file.isFile()) {
                 fileList.add(file);
                 System.out.println("add file:" + file.getName());
-            } else {//目录
-                if (file.listFiles().length != 0) {//非空目录
-                    fileList.addAll(getAllFile(file));//把递归文件加到fileList中
-                } else {//空目录
+            } else {
+                if (file.listFiles().length != 0) {
+                    fileList.addAll(getAllFile(file));
+                } else {
                     fileList.add(file);
                     System.out.println("add empty dir:" + file.getName());
                 }
@@ -66,13 +58,6 @@ public class ZipBackup {
         }
         return fileList;
     }
-    
-    /**
-     * 获取相对路径
-     *
-     * @param dirPath 源文件路径
-     * @param file    准备压缩的单个文件
-     */
     public static String getRelativePath(String dirPath, File file) {
         File dirFile = new File(dirPath);
         String relativePath = file.getName();
@@ -93,11 +78,7 @@ public class ZipBackup {
         compress("D:\\IDEA-Project\\JProxyPool\\resources");
     }
     
-    /**
-     * 没有指定压缩目标路径进行压缩,用默认的路径进行压缩
-     *
-     * @param dirPath 压缩源文件路径
-     */
+
     public static void compress(String dirPath) {
         
         int firstIndex = dirPath.indexOf("/");
@@ -109,12 +90,7 @@ public class ZipBackup {
                 zipFileName.replace("\\resources","")+"\\backup\\resources_"+(1970+date.getYear())+"-"+(date.getMonth()+1)+"-"+date.getDate());
     }
     
-    /**
-     * 压缩文件
-     *
-     * @param dirPath     压缩源文件路径
-     * @param zipFileName 压缩目标文件路径
-     */
+
     public static void compress(String dirPath, String zipFileName) {
         zipFileName = zipFileName + SUFFIX;//添加文件的后缀名
         System.out.println(zipFileName);

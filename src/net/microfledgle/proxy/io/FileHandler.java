@@ -36,12 +36,6 @@ public class FileHandler {
     }
     
     
-    /**
-     * 传入txt路径读取txt文件
-     *
-     * @param fileName 文件名
-     * @return 返回读取到的内容
-     */
     public static Set<String> fileRead(String fileName) {
         String s = FILE_URL + fileName + ".txt";
         File file = new File(s);

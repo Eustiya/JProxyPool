@@ -78,18 +78,6 @@ public class HailiangProxy implements Website,Runnable{
     //^[1-9]$|(^[1-9][0-9]$)|(^[1-9][0-9][0-9]$)|(^[1-9][0-9][0-9][0-9]$)|(^[1-6][0-5][0-5][0-3][0-5]$)
     // 端口正则表达式
     
-//    public static void main(String[] args) {
-////        HashMap<String, Integer> proxies = getProxies("http://www.hailiangip.com/freeAgency/");
-//         //163.204.240.10    9999
-//        String s = "163.204.240.10";
-//        boolean matches = s.matches("^((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})(\\.((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})){3}$");
-//        String port = "9999";
-//        boolean matches1 = port.matches("^[1-9]$|(^[1-9][0-9]$)|(^[1-9][0-9][0-9]$)|(^[1-9][0-9][0-9][0-9]$)|" +
-//                "(^[1-6][0-5][0-5][0-3][0-5]$)");
-//        System.out.println(matches1);
-//
-//        System.out.println(matches);
-//    }
     
     public static HashMap<String,Integer> getProxies(String url){
         HashMap<String,Integer> proxies = new HashMap<>();

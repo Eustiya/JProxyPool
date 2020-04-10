@@ -65,7 +65,7 @@ public class PoolUtils {
         return proxy_;
     }
     
-    public static Proxy getProxy_(){
+    private static Proxy getProxy_(){
         Acme acme = PoolManager.getAcme();
         Commonly commonly = PoolManager.getCommonly();
         Excellent excellent = PoolManager.getExcellent();

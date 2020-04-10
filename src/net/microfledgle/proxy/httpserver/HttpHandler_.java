@@ -29,9 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-/**
- * 处理/myserver路径请求的处理器类
- */
 public class HttpHandler_ implements HttpHandler {
     @Override
     public void handle(HttpExchange httpExchange) {
@@ -70,10 +67,8 @@ public class HttpHandler_ implements HttpHandler {
         String paramStr = "";
         
         if (httpExchange.getRequestMethod().equals("GET")) {
-            //GET请求读queryString
             paramStr = httpExchange.getRequestURI().getQuery();
         } else {
-            //非GET请求读请求体
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(httpExchange.getRequestBody(), "utf-8"));
             StringBuilder requestBodyContent = new StringBuilder();
             String line = null;
@@ -102,11 +97,7 @@ public class HttpHandler_ implements HttpHandler {
                 .append("</html>");
         String responseContentStr = responseContent.toString();
         byte[] responseContentByte = responseContentStr.getBytes("utf-8");
-        
-        //设置响应头，必须在sendResponseHeaders方法之前设置！
-        httpExchange.getResponseHeaders().add("Content-Type:", "text/html;charset=utf-8");
-        
-        //设置响应码和响应体长度，必须在getResponseBody方法之前调用！
+         httpExchange.getResponseHeaders().add("Content-Type:", "text/html;charset=utf-8");
         httpExchange.sendResponseHeaders(200, responseContentByte.length);
         
         OutputStream out = httpExchange.getResponseBody();
