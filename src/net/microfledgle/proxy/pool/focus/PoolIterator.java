@@ -14,36 +14,29 @@
  * limitations under the License.
  */
 
-package net.microfledgle.proxy;
+package net.microfledgle.proxy.pool.focus;
 
-import net.microfledgle.proxy.grasp.GraspProxy;
-import net.microfledgle.proxy.httpserver.HttpServerStarter;
-import net.microfledgle.proxy.io.ReadProxies;
-import net.microfledgle.proxy.io.SaveProxies;
-import net.microfledgle.proxy.io.ZipBackup;
+import net.microfledgle.proxy.pool.Proxy;
+import net.microfledgle.proxy.timer.ThreadPoolHandler;
+
+import java.util.Iterator;
 
 /**
  * @author ：Arisa
- * @date ：Created in 2020/4/7 17:48
+ * @date ：Created in 2020/4/10 17:46
  * @description：
  * @version: $
  */
-public class Main {
+public class PoolIterator<T extends ProxyPool> {
     
-    public static void getProxies(){
-        GraspProxy.main(null);
+    private Iterator iterator;
+    
+    public PoolIterator(T proxyPool){
+        iterator = proxyPool.getProxies().iterator();
     }
     
-    public static void reload(){
-        ReadProxies.readAll();
-        ZipBackup.main(null);
-        SaveProxies.saveAll();
+    public Proxy getProxy(){
+       return (Proxy) iterator.next();
     }
     
-    public static void main(String[] args){
-        reload();
-        getProxies();
-        SaveProxies.start();
-        HttpServerStarter.main(null);
-    }
 }

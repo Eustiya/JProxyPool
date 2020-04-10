@@ -17,7 +17,6 @@
 package net.microfledgle.proxy.grasp.website;
 
 import net.microfledgle.proxy.grasp.Website;
-import net.microfledgle.proxy.io.FileHandler;
 import net.microfledgle.proxy.io.SaveProxies;
 import net.microfledgle.proxy.pool.PoolUtils;
 import net.microfledgle.proxy.pool.Proxy;
@@ -31,37 +30,41 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.net.InetSocketAddress;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author ：Arisa
- * @date ：Created in 2020/4/8 19:21
+ * @date ：Created in 2020/4/9 20:47
  * @description：
  * @version: $
  */
-public class KuaiProxy implements Website,Runnable {
+@Deprecated
+public class HailiangProxy implements Website,Runnable{
     
-    private static Logger logger = Logger.getLogger(KuaiProxy.class);
+    private static Logger logger = Logger.getLogger(HailiangProxy.class);
     
     private static ThreadPoolHandler threadPoolHandler = new ThreadPoolHandler();
     
     
     //"https://www.kuaidaili.com/free/inha/1/"
-    private static final String URL = "https://www.kuaidaili.com/free/inha/";
+//    private static final String URL = "http://www.hailiangip.com/freeAgency/1";
     
     private static void inits(){
-       for(int i=1,size=50;i<size;i++){
-           String url = URL+i+ "/";
-           KuaiConcurrentHandler.addURL(url);
-       }
-       KuaiConcurrentHandler.inits();
+        for(int i=1,size=50;i<size;i++){
+            String url = "http://www.hailiangip.com/freeAgency/"+i;
+            HailiangConcurrentHandler.addURL(url);
+        }
+        HailiangConcurrentHandler.inits();
     }
     
     public static void start(){
         inits();
+        
         for(int i =0;i<50;i++) {
-            threadPoolHandler.executor(new KuaiProxy());
+            threadPoolHandler.executor(new HailiangProxy());
             try {
                 Thread.sleep(6000);
             }catch (Exception e){
@@ -70,44 +73,62 @@ public class KuaiProxy implements Website,Runnable {
         }
     }
     
+    //^((2(5[0-5]|[0-4]\d))|[0-1]?\d{1,2})(\.((2(5[0-5]|[0-4]\d))|[0-1]?\d{1,2})){3}$
+    // ip正则表达式
+    //^[1-9]$|(^[1-9][0-9]$)|(^[1-9][0-9][0-9]$)|(^[1-9][0-9][0-9][0-9]$)|(^[1-6][0-5][0-5][0-3][0-5]$)
+    // 端口正则表达式
     
-    
+//    public static void main(String[] args) {
+////        HashMap<String, Integer> proxies = getProxies("http://www.hailiangip.com/freeAgency/");
+//         //163.204.240.10    9999
+//        String s = "163.204.240.10";
+//        boolean matches = s.matches("^((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})(\\.((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})){3}$");
+//        String port = "9999";
+//        boolean matches1 = port.matches("^[1-9]$|(^[1-9][0-9]$)|(^[1-9][0-9][0-9]$)|(^[1-9][0-9][0-9][0-9]$)|" +
+//                "(^[1-6][0-5][0-5][0-3][0-5]$)");
+//        System.out.println(matches1);
+//
+//        System.out.println(matches);
+//    }
     
     public static HashMap<String,Integer> getProxies(String url){
         HashMap<String,Integer> proxies = new HashMap<>();
+    
         try {
             Connection connect = Jsoup.connect(url);
             Document document = connect.get();
-            Elements elementsByClass = document.getElementsByClass("table-striped");
+            Elements elementsByClass = document.getElementsByClass("layui-table");
             Elements tbody = elementsByClass.select("tbody").select("tr");
             for (Element element : tbody) {
                 Elements td = element.getElementsByTag("td");
-                
+            
                 String ip = null;
                 String port = null;
                 for (Element element1 : td) {
-                    String ip$ = element1.getElementsByAttributeValue("data-title", "IP").text();
-                    if(!"".equals(ip$)){
-                       ip = ip$;
+                    String text = element1.text();
+                    if(text.matches("^((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})(\\.((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})" +
+                            "){3}$")){
+                        ip = text;
+                        continue;
                     }
-                    String port$ = element1.getElementsByAttributeValue("data-title", "PORT").text();
-                    if(!"".equals(port$)){
-                        port = port$;
+                    if(text.matches("^[1-9]$|(^[1-9][0-9]$)|(^[1-9][0-9][0-9]$)|(^[1-9][0-9][0-9][0-9]$)|(^[1-6][0-5][0-5][0-3][0-5]$)")){
+                        port = text;
                     }
                 }
                 if(ip=="" || port=="" || ip == null || port == null){
-                   continue;
+                    continue;
                 }
-                System.out.println("KuaiProxy"+ip+"|"+port);
+                System.out.println("Hailiang "+ip+"|"+port);
                 proxies.put(ip,Integer.parseInt(port));
             }
         }catch (Exception e){
             e.printStackTrace();
         }
+        
         return proxies;
     }
     
-    public static void main(String[] args) {
+    public static void  main(String[] args)  {
         try {
             start();
         }catch (Exception e){
@@ -140,7 +161,7 @@ public class KuaiProxy implements Website,Runnable {
     }
     
     public static void test(){
-        while (KuaiConcurrentHandler.hasNext()) {
+        while (HailiangConcurrentHandler.hasNext()) {
             HashMap<String, Integer> proxies =
                     getProxies(KuaiConcurrentHandler.getURL());
             addProxies$(proxies);
@@ -154,8 +175,9 @@ public class KuaiProxy implements Website,Runnable {
     
     @Override
     public void run() {
-            HashMap<String, Integer> proxies =
-                getProxies(KuaiConcurrentHandler.getURL());
+        HashMap<String, Integer> proxies =
+                getProxies(HailiangConcurrentHandler.getURL());
         this.addProxies(proxies);
     }
+    
 }

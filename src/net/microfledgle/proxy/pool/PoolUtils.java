@@ -16,8 +16,8 @@
 
 package net.microfledgle.proxy.pool;
 
-import net.microfledgle.proxy.pool.focus.PoolManager;
-import net.microfledgle.proxy.pool.focus.ProxyPool;
+import net.microfledgle.proxy.handler.AnonymityUtil;
+import net.microfledgle.proxy.pool.focus.*;
 
 /**
  * @author ：Arisa
@@ -49,6 +49,46 @@ public class PoolUtils {
     public static Proxy get(ProxyType proxyType, ProxyPool proxyPool){
         return null;
     }
+    
+    public static Proxy getProxy(){
+        Proxy proxy_ = getProxy_();
+       
+        boolean go = false;
+        int i = 0;
+        for(int anonymity = -1;anonymity==-1;anonymity = AnonymityUtil.getAnonymity(proxy_)){
+            i++;
+            if(i>=50){
+               new Exception("没有可用 代理");
+            }
+           proxy_ = getProxy_();
+        }
+        return proxy_;
+    }
+    
+    public static Proxy getProxy_(){
+        Acme acme = PoolManager.getAcme();
+        Commonly commonly = PoolManager.getCommonly();
+        Excellent excellent = PoolManager.getExcellent();
+        Poor poor = PoolManager.getPoor();
+        Proxy proxy = acme.getProxy();
+        if(proxy != null){
+            return proxy;
+        }
+        proxy = excellent.getProxy();
+        if(proxy != null){
+            return proxy;
+        }
+        proxy = commonly.getProxy();
+        if(proxy != null){
+            return proxy;
+        }
+        proxy = poor.getProxy();
+        if(proxy != null){
+            return proxy;
+        }
+         return null;
+    }
+    
     
     public static Proxy get(ProxyType proxyType){
         return null;

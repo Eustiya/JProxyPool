@@ -31,6 +31,8 @@ import java.util.Set;
  */
 public class SaveProxies implements Runnable{
     
+    
+    
     public static void saveAll(){
         Acme acme = PoolManager.getAcme();
         Commonly commonly = PoolManager.getCommonly();
@@ -48,16 +50,19 @@ public class SaveProxies implements Runnable{
     public static <T extends ProxyPool> void saveOne(T proxyPool){
         Set<Proxy> proxies = proxyPool.getProxies();
         Iterator<Proxy> iterator = proxies.iterator();
+        String simpleName = proxyPool.getClass().getSimpleName();
+        FileHandler.FileClean(simpleName);
         while(iterator.hasNext()){
             Proxy next = iterator.next();
             String serialize = Serialize.serialize(next);
-            FileHandler.FileWrite(proxyPool.getClass().getSimpleName(),serialize);
+            FileHandler.FileWrite(simpleName,serialize);
+            
         }
     }
     
     public static void start(){
         SaveProxies saveProxies = new SaveProxies();
-        ThreadPoolHandler.executor(saveProxies);
+        ThreadPoolHandler.executor_(saveProxies);
     }
     
     

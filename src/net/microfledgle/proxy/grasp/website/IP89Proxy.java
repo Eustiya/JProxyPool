@@ -17,51 +17,39 @@
 package net.microfledgle.proxy.grasp.website;
 
 import net.microfledgle.proxy.grasp.Website;
-import net.microfledgle.proxy.io.FileHandler;
 import net.microfledgle.proxy.io.SaveProxies;
 import net.microfledgle.proxy.pool.PoolUtils;
 import net.microfledgle.proxy.pool.Proxy;
 import net.microfledgle.proxy.pool.ProxyType;
-import net.microfledgle.proxy.pool.focus.PoolManager;
 import net.microfledgle.proxy.timer.ThreadPoolHandler;
 import org.apache.log4j.Logger;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
-import java.net.InetSocketAddress;
 import java.util.*;
 
 /**
  * @author ：Arisa
- * @date ：Created in 2020/4/8 19:21
+ * @date ：Created in 2020/4/10 2:01
  * @description：
  * @version: $
  */
-public class KuaiProxy implements Website,Runnable {
-    
-    private static Logger logger = Logger.getLogger(KuaiProxy.class);
+public class IP89Proxy implements Website,Runnable{
+    private static Logger logger = Logger.getLogger(IP89Proxy.class);
     
     private static ThreadPoolHandler threadPoolHandler = new ThreadPoolHandler();
     
     
-    //"https://www.kuaidaili.com/free/inha/1/"
-    private static final String URL = "https://www.kuaidaili.com/free/inha/";
     
-    private static void inits(){
-       for(int i=1,size=50;i<size;i++){
-           String url = URL+i+ "/";
-           KuaiConcurrentHandler.addURL(url);
-       }
-       KuaiConcurrentHandler.inits();
-    }
+    private static final int runningTimes = 50;
     
-    public static void start(){
+    public static void start() throws InterruptedException {
         inits();
-        for(int i =0;i<50;i++) {
-            threadPoolHandler.executor(new KuaiProxy());
+        Thread.sleep(2000);
+        for(int i =0;i<runningTimes;i++) {
+            threadPoolHandler.executor(new IP89Proxy());
             try {
                 Thread.sleep(6000);
             }catch (Exception e){
@@ -70,44 +58,40 @@ public class KuaiProxy implements Website,Runnable {
         }
     }
     
-    
-    
-    
-    public static HashMap<String,Integer> getProxies(String url){
-        HashMap<String,Integer> proxies = new HashMap<>();
+    public static void inits(){
         try {
-            Connection connect = Jsoup.connect(url);
-            Document document = connect.get();
-            Elements elementsByClass = document.getElementsByClass("table-striped");
-            Elements tbody = elementsByClass.select("tbody").select("tr");
-            for (Element element : tbody) {
-                Elements td = element.getElementsByTag("td");
-                
-                String ip = null;
-                String port = null;
-                for (Element element1 : td) {
-                    String ip$ = element1.getElementsByAttributeValue("data-title", "IP").text();
-                    if(!"".equals(ip$)){
-                       ip = ip$;
-                    }
-                    String port$ = element1.getElementsByAttributeValue("data-title", "PORT").text();
-                    if(!"".equals(port$)){
-                        port = port$;
-                    }
+            String s = "http://www.89ip.cn/tqdl.html?num=9999&address=&kill_address=&port=&kill_port=&isp=";
+            Connection cont = Jsoup.connect(s);
+            Document document1 = cont.get();
+            String text = document1.text();
+            String[] s1 = text.split(" ");
+            for (int i = 1; i <s1.length; i++) {
+               
+                String s2 = s1[i];
+                if(s2.indexOf(":")!=-1 && s2.indexOf("http")==-1){
+                    System.out.println("IP89 "+s2);
+                    IP89ConcurrentHandler.addURL(s2);
                 }
-                if(ip=="" || port=="" || ip == null || port == null){
-                   continue;
-                }
-                System.out.println("KuaiProxy"+ip+"|"+port);
-                proxies.put(ip,Integer.parseInt(port));
             }
+            IP89ConcurrentHandler.inits();
         }catch (Exception e){
             e.printStackTrace();
         }
+    }
+    
+    
+    
+    public static HashMap<String,Integer> getProxies(List<String> addresses){
+        HashMap<String,Integer> proxies = new HashMap<>();
+        for (String address : addresses) {
+            String[] split = address.split(":");
+            proxies.put(split[0],Integer.parseInt(split[1]));
+        }
+        
         return proxies;
     }
     
-    public static void main(String[] args) {
+    public static void  main(String[] args) {
         try {
             start();
         }catch (Exception e){
@@ -140,9 +124,13 @@ public class KuaiProxy implements Website,Runnable {
     }
     
     public static void test(){
-        while (KuaiConcurrentHandler.hasNext()) {
+        while (IP89ConcurrentHandler.hasNext()) {
+            List<String> list = new ArrayList<>();
+            for (int i = 0; i < 10; i++) {
+                list.add(IP89ConcurrentHandler.getURL());
+            }
             HashMap<String, Integer> proxies =
-                    getProxies(KuaiConcurrentHandler.getURL());
+                    getProxies(list);
             addProxies$(proxies);
             try {
                 Thread.sleep(5000);
@@ -154,8 +142,12 @@ public class KuaiProxy implements Website,Runnable {
     
     @Override
     public void run() {
-            HashMap<String, Integer> proxies =
-                getProxies(KuaiConcurrentHandler.getURL());
+        List<String> list = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            list.add(IP89ConcurrentHandler.getURL());
+        }
+        HashMap<String, Integer> proxies =
+                getProxies(list);
         this.addProxies(proxies);
     }
 }

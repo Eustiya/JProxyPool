@@ -28,14 +28,22 @@ import java.util.concurrent.TimeUnit;
  */
 public class ThreadPoolHandler {
     
-    public static ThreadPoolExecutor executors = new ThreadPoolExecutor(10, 1000, 200, TimeUnit.MILLISECONDS,
+    public ThreadPoolExecutor executors = new ThreadPoolExecutor(10, 1000, 200, TimeUnit.MILLISECONDS,
             new ArrayBlockingQueue<Runnable>(5));
     
-    public static void inits(){
+    
+    public void inits(){
     
     }
     
-    public static void executor(Runnable runnable){
+    public static ThreadPoolExecutor executors_ = new ThreadPoolExecutor(10, 1000, 200, TimeUnit.MILLISECONDS,
+            new ArrayBlockingQueue<Runnable>(5));
+    
+    public static void executor_(Runnable runnable){
+        executors_.execute(runnable);
+    }
+    
+    public void executor(Runnable runnable){
         executors.execute(runnable);
     }
 }

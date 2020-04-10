@@ -63,8 +63,9 @@ public class Proxy {
         proxySpeed = ProxySpeed.SLOWEST;
         this.address = address;
         this.port = port;
-        this.anonymityDegree = AnonymityUtil.getAnonymityDegree(this);
         this.proxyPriority = PingUtil.getProxyPriority(this);
+        this.anonymityDegree = AnonymityUtil.getAnonymityDegree(this);
+        
     }
     
     public Proxy(String address, String port, ProxyType proxyType, String username, String password){
@@ -73,8 +74,9 @@ public class Proxy {
         this.port = port;
         this.username = username;
         this.password = password;
-        this.anonymityDegree = AnonymityUtil.getAnonymityDegree(this);
         this.proxyPriority = PingUtil.getProxyPriority(this);
+        this.anonymityDegree = AnonymityUtil.getAnonymityDegree(this);
+        
     }
     
     
@@ -94,6 +96,41 @@ public class Proxy {
     public Proxy setPort(String port) {
         this.port = port;
         return this;
+    }
+    
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("Proxy{");
+        sb.append("address='").append(address).append('\'');
+        sb.append(", port='").append(port).append('\'');
+        sb.append(", anonymityDegree=").append(anonymityDegree);
+        sb.append(", proxyPriority=").append(proxyPriority);
+        sb.append(", proxySpeed=").append(proxySpeed);
+        sb.append(", proxyType=").append(proxyType);
+        sb.append(", username='").append(username).append('\'');
+        sb.append(", password='").append(password).append('\'');
+        sb.append('}');
+        return sb.toString();
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Proxy)) return false;
+        Proxy proxy = (Proxy) o;
+        return Objects.equals(getAddress(), proxy.getAddress()) &&
+                Objects.equals(getPort(), proxy.getPort()) &&
+                getAnonymityDegree() == proxy.getAnonymityDegree() &&
+                getProxyPriority() == proxy.getProxyPriority() &&
+                getProxySpeed() == proxy.getProxySpeed() &&
+                getProxyType() == proxy.getProxyType() &&
+                Objects.equals(getUsername(), proxy.getUsername()) &&
+                Objects.equals(getPassword(), proxy.getPassword());
+    }
+    
+    @Override
+    public int hashCode() {
+        return Objects.hash(getAddress(), getPort(), getAnonymityDegree(), getProxyPriority(), getProxySpeed(), getProxyType(), getUsername(), getPassword());
     }
     
     public AnonymityDegree getAnonymityDegree() {
@@ -150,23 +187,4 @@ public class Proxy {
         return this;
     }
     
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Proxy)) return false;
-        Proxy proxy = (Proxy) o;
-        return Objects.equals(address, proxy.address) &&
-                Objects.equals(port, proxy.port) &&
-                anonymityDegree == proxy.anonymityDegree &&
-                proxyPriority == proxy.proxyPriority &&
-                proxySpeed == proxy.proxySpeed &&
-                proxyType == proxy.proxyType &&
-                Objects.equals(username, proxy.username) &&
-                Objects.equals(password, proxy.password);
-    }
-    
-    @Override
-    public int hashCode() {
-        return Objects.hash(address, port, anonymityDegree, proxyPriority, proxySpeed, proxyType, username, password);
-    }
 }

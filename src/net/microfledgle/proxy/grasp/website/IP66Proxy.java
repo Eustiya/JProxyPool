@@ -17,7 +17,6 @@
 package net.microfledgle.proxy.grasp.website;
 
 import net.microfledgle.proxy.grasp.Website;
-import net.microfledgle.proxy.io.FileHandler;
 import net.microfledgle.proxy.io.SaveProxies;
 import net.microfledgle.proxy.pool.PoolUtils;
 import net.microfledgle.proxy.pool.Proxy;
@@ -31,37 +30,30 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.net.InetSocketAddress;
 import java.util.*;
 
 /**
  * @author ：Arisa
- * @date ：Created in 2020/4/8 19:21
+ * @date ：Created in 2020/4/10 0:36
  * @description：
  * @version: $
  */
-public class KuaiProxy implements Website,Runnable {
-    
-    private static Logger logger = Logger.getLogger(KuaiProxy.class);
+public class IP66Proxy implements Website,Runnable {
+    private static Logger logger = Logger.getLogger(IP66Proxy.class);
     
     private static ThreadPoolHandler threadPoolHandler = new ThreadPoolHandler();
     
     
-    //"https://www.kuaidaili.com/free/inha/1/"
-    private static final String URL = "https://www.kuaidaili.com/free/inha/";
     
-    private static void inits(){
-       for(int i=1,size=50;i<size;i++){
-           String url = URL+i+ "/";
-           KuaiConcurrentHandler.addURL(url);
-       }
-       KuaiConcurrentHandler.inits();
-    }
+    private static final String URL = "http://www.66ip.cn/pt.html";
     
-    public static void start(){
+    private static final int runningTimes = 50;
+    
+    public static void start() throws InterruptedException {
         inits();
-        for(int i =0;i<50;i++) {
-            threadPoolHandler.executor(new KuaiProxy());
+        Thread.sleep(2000);
+        for(int i =0;i<runningTimes;i++) {
+            threadPoolHandler.executor(new IP66Proxy());
             try {
                 Thread.sleep(6000);
             }catch (Exception e){
@@ -70,44 +62,49 @@ public class KuaiProxy implements Website,Runnable {
         }
     }
     
-    
-    
-    
-    public static HashMap<String,Integer> getProxies(String url){
-        HashMap<String,Integer> proxies = new HashMap<>();
+    public static void inits(){
+        Connection connect = Jsoup.connect("http://www.66ip.cn/pt.html");
         try {
-            Connection connect = Jsoup.connect(url);
             Document document = connect.get();
-            Elements elementsByClass = document.getElementsByClass("table-striped");
-            Elements tbody = elementsByClass.select("tbody").select("tr");
-            for (Element element : tbody) {
-                Elements td = element.getElementsByTag("td");
-                
-                String ip = null;
-                String port = null;
-                for (Element element1 : td) {
-                    String ip$ = element1.getElementsByAttributeValue("data-title", "IP").text();
-                    if(!"".equals(ip$)){
-                       ip = ip$;
-                    }
-                    String port$ = element1.getElementsByAttributeValue("data-title", "PORT").text();
-                    if(!"".equals(port$)){
-                        port = port$;
-                    }
-                }
-                if(ip=="" || port=="" || ip == null || port == null){
-                   continue;
-                }
-                System.out.println("KuaiProxy"+ip+"|"+port);
-                proxies.put(ip,Integer.parseInt(port));
+            Element form = document.getElementById("form");
+            String number = form.select("td").select("span").get(0).select("strong").text();
+            if(number == "0"){
+              return;
             }
+            String s = "http://www.66ip.cn/mo.php?sxb=&tqsl=" + number + "&ports%5B%5D2=&ktip=&sxa=&radio=radio&submit=%CC%E1++%C8%A1&textarea=";
+            Connection cont = Jsoup.connect(s);
+            Document document1 = cont.get();
+            String text = document1.text();
+            String[] s1 = text.split(" ");
+            for (int i = 1; i < s1.length; i++) {
+                System.out.println("IP66 "+s1[i]);
+                IP66ConcurrentHandler.addURL(s1[i]);
+            }
+            IP66ConcurrentHandler.inits();
         }catch (Exception e){
             e.printStackTrace();
         }
+    }
+    
+    
+    //^((2(5[0-5]|[0-4]\d))|[0-1]?\d{1,2})(\.((2(5[0-5]|[0-4]\d))|[0-1]?\d{1,2})){3}$
+    // ip正则表达式
+    //^[1-9]$|(^[1-9][0-9]$)|(^[1-9][0-9][0-9]$)|(^[1-9][0-9][0-9][0-9]$)|(^[1-6][0-5][0-5][0-3][0-5]$)
+    // 端口正则表达式
+    
+    
+    public static HashMap<String,Integer> getProxies(List<String> addresses){
+        HashMap<String,Integer> proxies = new HashMap<>();
+        for (String address : addresses) {
+            String[] split = address.split(":");
+            proxies.put(split[0],Integer.parseInt(split[1]));
+        }
+        
         return proxies;
     }
     
-    public static void main(String[] args) {
+    public static void  main(String[] args) {
+        
         try {
             start();
         }catch (Exception e){
@@ -140,9 +137,13 @@ public class KuaiProxy implements Website,Runnable {
     }
     
     public static void test(){
-        while (KuaiConcurrentHandler.hasNext()) {
+        while (IP66ConcurrentHandler.hasNext()) {
+            List<String> list = new ArrayList<>();
+            for (int i = 0; i < 10; i++) {
+                list.add(IP66ConcurrentHandler.getURL());
+            }
             HashMap<String, Integer> proxies =
-                    getProxies(KuaiConcurrentHandler.getURL());
+                    getProxies(list);
             addProxies$(proxies);
             try {
                 Thread.sleep(5000);
@@ -154,8 +155,12 @@ public class KuaiProxy implements Website,Runnable {
     
     @Override
     public void run() {
-            HashMap<String, Integer> proxies =
-                getProxies(KuaiConcurrentHandler.getURL());
+        List<String> list = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            list.add(IP66ConcurrentHandler.getURL());
+        }
+        HashMap<String, Integer> proxies =
+                getProxies(list);
         this.addProxies(proxies);
     }
 }

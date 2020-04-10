@@ -17,7 +17,6 @@
 package net.microfledgle.proxy.grasp.website;
 
 import net.microfledgle.proxy.grasp.Website;
-import net.microfledgle.proxy.io.FileHandler;
 import net.microfledgle.proxy.io.SaveProxies;
 import net.microfledgle.proxy.pool.PoolUtils;
 import net.microfledgle.proxy.pool.Proxy;
@@ -30,38 +29,57 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.omg.CORBA.PRIVATE_MEMBER;
 
-import java.net.InetSocketAddress;
 import java.util.*;
 
 /**
  * @author ：Arisa
- * @date ：Created in 2020/4/8 19:21
+ * @date ：Created in 2020/4/9 23:00
  * @description：
  * @version: $
  */
-public class KuaiProxy implements Website,Runnable {
+public class XSProxy implements Website,Runnable {
     
-    private static Logger logger = Logger.getLogger(KuaiProxy.class);
+    private static Logger logger = Logger.getLogger(XSProxy.class);
     
     private static ThreadPoolHandler threadPoolHandler = new ThreadPoolHandler();
     
     
     //"https://www.kuaidaili.com/free/inha/1/"
-    private static final String URL = "https://www.kuaidaili.com/free/inha/";
+    private static final String URL = "http://www.xsdaili.com/dayProxy/ip/";
+    
+    private static final int runningTimes = 50;
+    
+    
+    //2093 2092 = 2020 4 9
+   
+    
+    private static long getDateNumber(){
+        Date date = new Date();
+        long days = date.getDate();
+        int months = date.getMonth() + 1;
+        //TODO 改
+        long l = ((4 - months) + days - 1) * 2+2093;
+        return l;
+    }
+    
     
     private static void inits(){
-       for(int i=1,size=50;i<size;i++){
-           String url = URL+i+ "/";
-           KuaiConcurrentHandler.addURL(url);
-       }
-       KuaiConcurrentHandler.inits();
+        long dateNumber = getDateNumber();
+        long times = dateNumber - runningTimes *2;
+        for(;dateNumber>times;dateNumber--){
+            String url = URL+dateNumber+".html";
+            XSConcurrentHandler.addURL(url);
+        }
+        XSConcurrentHandler.inits();
     }
     
     public static void start(){
         inits();
-        for(int i =0;i<50;i++) {
-            threadPoolHandler.executor(new KuaiProxy());
+        
+        for(int i =0;i<runningTimes;i++) {
+            threadPoolHandler.executor(new XSProxy());
             try {
                 Thread.sleep(6000);
             }catch (Exception e){
@@ -71,43 +89,45 @@ public class KuaiProxy implements Website,Runnable {
     }
     
     
-    
+    //^((2(5[0-5]|[0-4]\d))|[0-1]?\d{1,2})(\.((2(5[0-5]|[0-4]\d))|[0-1]?\d{1,2})){3}$
+    // ip正则表达式
+    //^[1-9]$|(^[1-9][0-9]$)|(^[1-9][0-9][0-9]$)|(^[1-9][0-9][0-9][0-9]$)|(^[1-6][0-5][0-5][0-3][0-5]$)
+    // 端口正则表达式
+
+//    public static void main(String[] args) {
+////        HashMap<String, Integer> proxies = getProxies("http://www.hailiangip.com/freeAgency/");
+//         //163.204.240.10    9999
+//        String s = "163.204.240.10";
+//        boolean matches = s.matches("^((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})(\\.((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})){3}$");
+//        String port = "9999";
+//        boolean matches1 = port.matches("^[1-9]$|(^[1-9][0-9]$)|(^[1-9][0-9][0-9]$)|(^[1-9][0-9][0-9][0-9]$)|" +
+//                "(^[1-6][0-5][0-5][0-3][0-5]$)");
+//        System.out.println(matches1);
+//
+//        System.out.println(matches);
+//    }
     
     public static HashMap<String,Integer> getProxies(String url){
         HashMap<String,Integer> proxies = new HashMap<>();
         try {
             Connection connect = Jsoup.connect(url);
             Document document = connect.get();
-            Elements elementsByClass = document.getElementsByClass("table-striped");
-            Elements tbody = elementsByClass.select("tbody").select("tr");
+            Elements elementsByClass = document.getElementsByClass("cont");
+            Elements tbody = elementsByClass.tagName("br");
             for (Element element : tbody) {
-                Elements td = element.getElementsByTag("td");
-                
-                String ip = null;
-                String port = null;
-                for (Element element1 : td) {
-                    String ip$ = element1.getElementsByAttributeValue("data-title", "IP").text();
-                    if(!"".equals(ip$)){
-                       ip = ip$;
-                    }
-                    String port$ = element1.getElementsByAttributeValue("data-title", "PORT").text();
-                    if(!"".equals(port$)){
-                        port = port$;
-                    }
-                }
-                if(ip=="" || port=="" || ip == null || port == null){
-                   continue;
-                }
-                System.out.println("KuaiProxy"+ip+"|"+port);
-                proxies.put(ip,Integer.parseInt(port));
+                String text1 = element.text();
+                String substring = text1.substring(0,text1.indexOf("@"));
+                String[] split = substring.split(":");
+                proxies.put(split[0],Integer.parseInt(split[1]));
             }
+            System.out.println("XSProxy"+proxies);
         }catch (Exception e){
             e.printStackTrace();
         }
         return proxies;
     }
     
-    public static void main(String[] args) {
+    public static void  main(String[] args) {
         try {
             start();
         }catch (Exception e){
@@ -140,9 +160,9 @@ public class KuaiProxy implements Website,Runnable {
     }
     
     public static void test(){
-        while (KuaiConcurrentHandler.hasNext()) {
+        while (XSConcurrentHandler.hasNext()) {
             HashMap<String, Integer> proxies =
-                    getProxies(KuaiConcurrentHandler.getURL());
+                    getProxies(XSConcurrentHandler.getURL());
             addProxies$(proxies);
             try {
                 Thread.sleep(5000);
@@ -154,8 +174,10 @@ public class KuaiProxy implements Website,Runnable {
     
     @Override
     public void run() {
-            HashMap<String, Integer> proxies =
-                getProxies(KuaiConcurrentHandler.getURL());
+        HashMap<String, Integer> proxies =
+                getProxies(XSConcurrentHandler.getURL());
         this.addProxies(proxies);
     }
+    
+    
 }

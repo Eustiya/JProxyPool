@@ -38,12 +38,19 @@ public class PingUtil {
     
     public static Proxy setDelay(Proxy proxy){
         String address = proxy.getAddress();
+        if(!isHostPortReachable(address,Integer.parseInt(proxy.getPort()))) {
+            proxy.setProxyPriority(ProxyPriority.DEAD);
+            return proxy;
+        }
         int pingDelay = PingUtil.getPingDelay(address);
         proxy.setProxyPriority(getProxyPriority$(pingDelay));
         return proxy;
     }
     
     public static ProxyPriority getProxyPriority(Proxy proxy){
+       
+       
+       
        return getProxyPriority$(PingUtil.getPingDelay(proxy.getAddress()));
     }
     
@@ -142,12 +149,12 @@ public class PingUtil {
      * @param port
      * @return
      */
-    private static boolean isHostPortReachable(String host,Integer port,Integer timeOut){
+    private static boolean isHostPortReachable(String host,Integer port){
         Boolean isConnect = false;
         Socket connect = new Socket();
         try {
             InetSocketAddress inetSocketAddress = new InetSocketAddress(host, port);
-            connect.connect(inetSocketAddress, timeOut);
+            connect.connect(inetSocketAddress, 3000);
             isConnect = connect.isConnected();
         } catch (IOException e) {
         
@@ -167,6 +174,7 @@ public class PingUtil {
         String ipAddress = "www.baidu.com";
         int pingDelay = getPingDelay(ipAddress);
         System.out.println(pingDelay);
+//        System.out.println(isHostPortReachable("www.baidu.com",812));
         long l2 = System.nanoTime();
         System.out.println("花费"+(l2-l)+"ns");
     }

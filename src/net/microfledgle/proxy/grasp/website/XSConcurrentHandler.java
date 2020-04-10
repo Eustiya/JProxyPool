@@ -18,16 +18,17 @@ package net.microfledgle.proxy.grasp.website;
 
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
 /**
  * @author ：Arisa
- * @date ：Created in 2020/4/8 19:48
+ * @date ：Created in 2020/4/9 23:00
  * @description：
  * @version: $
  */
-public class KuaiConcurrentHandler {
+public class XSConcurrentHandler {
+    
+    
     
     private static Set<String> urls = new HashSet<>();
     private static Iterator<String> iterator;
@@ -41,8 +42,8 @@ public class KuaiConcurrentHandler {
     }
     
     public static void addURL(String url){
-         urls.add(url);
-         
+        urls.add(url);
+        
     }
     
     public static boolean hasNext(){
@@ -58,4 +59,7 @@ public class KuaiConcurrentHandler {
             return iterator.next();
         }
         return null;
-    }}
+    }
+    
+    
+}

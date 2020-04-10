@@ -85,6 +85,14 @@ public class PoolManager {
     }
     
     private static ProxyPool getProxiesPool(Proxy proxy){
+        if(proxy == null){
+            try {
+                throw new NullPointerException();
+            }catch (Exception e){
+                e.printStackTrace();
+                return null;
+            }
+        }
          int score =
                  proxy.getAnonymityDegree().getScore()+proxy.getProxyPriority().getScore()+proxy.getProxySpeed().getScore();
          if (score>8000){
@@ -123,16 +131,25 @@ public class PoolManager {
     
     public static void addProxy(Proxy proxy){
         ProxyPool proxiesPool = getProxiesPool(proxy);
+        if(proxiesPool == null){
+          return;
+        }
         proxiesPool.addProxy(proxy);
     }
     
     public static void delProxy(Proxy proxy){
         ProxyPool proxiesPool = getProxiesPool(proxy);
+        if(proxiesPool == null){
+            return;
+        }
         proxiesPool.delProxy(proxy);
     }
     
     public static boolean contains(Proxy proxy){
         ProxyPool proxiesPool = getProxiesPool(proxy);
+        if(proxiesPool == null){
+            return false;
+        }
         return proxiesPool.containsProxy(proxy);
     }
 }

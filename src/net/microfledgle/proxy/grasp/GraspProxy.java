@@ -16,6 +16,9 @@
 
 package net.microfledgle.proxy.grasp;
 
+import net.microfledgle.proxy.grasp.website.*;
+import net.microfledgle.proxy.timer.ThreadPoolHandler;
+
 /**
  * @author ：Arisa
  * @date ：Created in 2020/4/8 19:22
@@ -24,7 +27,18 @@ package net.microfledgle.proxy.grasp;
  */
 public class GraspProxy {
 
-   public static void inits(){
-       
+   public static void inits() {
+   
+      ThreadPoolHandler.executor_(() -> EmailtryProxy.main(null));
+//      ThreadPoolHandler.executor_(() -> HailiangProxy.main(null));
+      ThreadPoolHandler.executor_(() -> IP89Proxy.main(null));
+      ThreadPoolHandler.executor_(() -> IP66Proxy.main(null));
+      ThreadPoolHandler.executor_(() -> KuaiProxy.main(null));
+      ThreadPoolHandler.executor_(() -> XSProxy.main(null));
+      
+   }
+   
+   public static void main(String[] args) {
+      inits();
    }
 }

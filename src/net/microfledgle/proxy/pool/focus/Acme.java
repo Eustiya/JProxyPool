@@ -31,6 +31,8 @@ import java.util.Set;
 public class Acme implements ProxyPool{
     
     private Set<Proxy> proxies = new HashSet<>();
+    
+    private PoolIterator<Acme> poolIterator = new PoolIterator(this);
 
     
     public Set<Proxy> getProxies() {
@@ -78,6 +80,8 @@ public class Acme implements ProxyPool{
     
     @Override
     public Proxy getProxy() {
+        
+        
         if(!hasProxy()){
             return null;
         }

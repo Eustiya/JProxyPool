@@ -17,7 +17,6 @@
 package net.microfledgle.proxy.grasp.website;
 
 import net.microfledgle.proxy.grasp.Website;
-import net.microfledgle.proxy.io.FileHandler;
 import net.microfledgle.proxy.io.SaveProxies;
 import net.microfledgle.proxy.pool.PoolUtils;
 import net.microfledgle.proxy.pool.Proxy;
@@ -31,37 +30,38 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.net.InetSocketAddress;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author ：Arisa
- * @date ：Created in 2020/4/8 19:21
+ * @date ：Created in 2020/4/9 23:00
  * @description：
  * @version: $
  */
-public class KuaiProxy implements Website,Runnable {
+public class EmailtryProxy implements Website,Runnable {
     
-    private static Logger logger = Logger.getLogger(KuaiProxy.class);
+    private static Logger logger = Logger.getLogger(EmailtryProxy.class);
     
     private static ThreadPoolHandler threadPoolHandler = new ThreadPoolHandler();
     
     
-    //"https://www.kuaidaili.com/free/inha/1/"
-    private static final String URL = "https://www.kuaidaili.com/free/inha/";
     
     private static void inits(){
-       for(int i=1,size=50;i<size;i++){
-           String url = URL+i+ "/";
-           KuaiConcurrentHandler.addURL(url);
-       }
-       KuaiConcurrentHandler.inits();
+        for(int i=1,size=50;i<size;i++){
+            String url = "http://www.emailtry.com/index/"+i;
+            EmailtryConcurrentHandler.addURL(url);
+        }
+        EmailtryConcurrentHandler.inits();
     }
     
     public static void start(){
         inits();
+        
         for(int i =0;i<50;i++) {
-            threadPoolHandler.executor(new KuaiProxy());
+            threadPoolHandler.executor(new EmailtryProxy());
             try {
                 Thread.sleep(6000);
             }catch (Exception e){
@@ -70,44 +70,34 @@ public class KuaiProxy implements Website,Runnable {
         }
     }
     
-    
-    
-    
+    //^((2(5[0-5]|[0-4]\d))|[0-1]?\d{1,2})(\.((2(5[0-5]|[0-4]\d))|[0-1]?\d{1,2})){3}$
+    // ip正则表达式
+    //^[1-9]$|(^[1-9][0-9]$)|(^[1-9][0-9][0-9]$)|(^[1-9][0-9][0-9][0-9]$)|(^[1-6][0-5][0-5][0-3][0-5]$)
+    // 端口正则表达式
+
     public static HashMap<String,Integer> getProxies(String url){
         HashMap<String,Integer> proxies = new HashMap<>();
         try {
             Connection connect = Jsoup.connect(url);
             Document document = connect.get();
-            Elements elementsByClass = document.getElementsByClass("table-striped");
+            Element elementsByClass = document.getElementById("proxy-table1");
             Elements tbody = elementsByClass.select("tbody").select("tr");
             for (Element element : tbody) {
                 Elements td = element.getElementsByTag("td");
-                
-                String ip = null;
-                String port = null;
-                for (Element element1 : td) {
-                    String ip$ = element1.getElementsByAttributeValue("data-title", "IP").text();
-                    if(!"".equals(ip$)){
-                       ip = ip$;
-                    }
-                    String port$ = element1.getElementsByAttributeValue("data-title", "PORT").text();
-                    if(!"".equals(port$)){
-                        port = port$;
-                    }
-                }
-                if(ip=="" || port=="" || ip == null || port == null){
-                   continue;
-                }
-                System.out.println("KuaiProxy"+ip+"|"+port);
-                proxies.put(ip,Integer.parseInt(port));
+                //TODO 不够安全
+                Element elementsByIndexEquals = td.get(0);
+                String text1 = elementsByIndexEquals.text();
+                String[] split = text1.split(":");
+                proxies.put(split[0],Integer.parseInt(split[1]));
             }
+            System.out.println("Emailtry "+proxies);
         }catch (Exception e){
             e.printStackTrace();
         }
         return proxies;
     }
     
-    public static void main(String[] args) {
+    public static void  main(String[] args) {
         try {
             start();
         }catch (Exception e){
@@ -140,9 +130,9 @@ public class KuaiProxy implements Website,Runnable {
     }
     
     public static void test(){
-        while (KuaiConcurrentHandler.hasNext()) {
+        while (EmailtryConcurrentHandler.hasNext()) {
             HashMap<String, Integer> proxies =
-                    getProxies(KuaiConcurrentHandler.getURL());
+                    getProxies(EmailtryConcurrentHandler.getURL());
             addProxies$(proxies);
             try {
                 Thread.sleep(5000);
@@ -154,8 +144,9 @@ public class KuaiProxy implements Website,Runnable {
     
     @Override
     public void run() {
-            HashMap<String, Integer> proxies =
-                getProxies(KuaiConcurrentHandler.getURL());
+        HashMap<String, Integer> proxies =
+                getProxies(EmailtryConcurrentHandler.getURL());
         this.addProxies(proxies);
     }
+    
 }

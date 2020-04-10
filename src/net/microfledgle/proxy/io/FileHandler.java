@@ -16,9 +16,8 @@
 
 package net.microfledgle.proxy.io;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.util.*;
 
 /**
  * @author ：Arisa
@@ -30,26 +29,49 @@ public class FileHandler {
     
     public static String FILE_URL;
     
-    static{
+    static {
         String path = FileHandler.class.getResource("/").getPath();
         String substring = path.replace("target/classes/", "").substring(1);
-        FILE_URL = substring+"resources/";
+        FILE_URL = substring + "resources/";
     }
     
     
-    public static void main(String[] args) {
-        String path = FileHandler.class.getResource("/").getPath();
-        String substring = path.replace("target/classes/", "").substring(1);
-        String s = substring+"resources/proxy.txt";
-        System.out.println(s);
+    /**
+     * 传入txt路径读取txt文件
+     *
+     * @param fileName 文件名
+     * @return 返回读取到的内容
+     */
+    public static Set<String> fileRead(String fileName) {
+        String s = FILE_URL + fileName + ".txt";
+        File file = new File(s);
+        if (file.isFile() && file.exists()) {
+            try {
+                FileInputStream fileInputStream = new FileInputStream(file);
+                InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream);
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                
+                Set<String> list = new HashSet<>();
+                String text = null;
+                while ((text = bufferedReader.readLine()) != null) {
+                    list.add(text);
+                }
+                return list;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
     }
     
-    public static void createFinle(String path){
+    
+    
+    public static void createFinle(String path) {
         File writename = new File(path);
-        if(!writename.exists()){
+        if (!writename.exists()) {
             try {
                 writename.createNewFile();
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -57,13 +79,13 @@ public class FileHandler {
     
     
     public static void FileWrite(String fileName, String content) {
-        String s = FILE_URL + fileName+".txt";
+        String s = FILE_URL + fileName + ".txt";
         createFinle(s);
         FileWriter writer = null;
         try {
             writer = new FileWriter(s, true);
             
-            writer.write(content+"\r\n");
+            writer.write(content + "\r\n");
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -78,8 +100,9 @@ public class FileHandler {
         }
     }
     
+    
     public static void FileClean(String fileName) {
-        String s = FILE_URL + fileName+".txt";
+        String s = FILE_URL + fileName + ".txt";
         createFinle(s);
         FileWriter writer = null;
         try {
