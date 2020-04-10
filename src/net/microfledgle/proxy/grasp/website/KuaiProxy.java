@@ -82,7 +82,6 @@ public class KuaiProxy implements Website,Runnable {
             Elements tbody = elementsByClass.select("tbody").select("tr");
             for (Element element : tbody) {
                 Elements td = element.getElementsByTag("td");
-                
                 String ip = null;
                 String port = null;
                 for (Element element1 : td) {
